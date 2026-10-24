@@ -1,0 +1,187 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>EPS-TOPIK Quiz Practice</title>
+<style>
+*{box-sizing:border-box}
+body{font-family:Arial,sans-serif;background:#fff5f8;color:#343044;margin:0;padding:16px}
+main{max-width:650px;margin:auto}
+header,.panel{background:white;border-radius:18px;padding:20px;margin-bottom:16px;box-shadow:0 3px 12px #e8dce5}
+h1{color:#bd648c;font-size:26px;margin:0 0 8px}
+h2{font-size:21px}
+p{line-height:1.5}
+select,button{font-size:16px;padding:13px;border-radius:10px;width:100%;margin:6px 0;border:1px solid #e2cbd7}
+button{background:#bd648c;color:white;border:0;font-weight:bold;cursor:pointer}
+button:disabled{opacity:.5}
+.choice{background:#f9eaf1;color:#343044;text-align:left;border:1px solid #efd5e2}
+.choice:disabled{opacity:1}
+.correct{background:#d9f5df!important;border-color:#58a66b!important}
+.wrong{background:#ffe0e0!important;border-color:#dc7777!important}
+.small{color:#746b7a;font-size:14px}
+#feedback{font-weight:bold}
+#progress{font-size:14px;color:#766b79}
+</style>
+</head>
+<body>
+<main>
+<header>
+<h1>🌸 EPS-TOPIK Study Hub</h1>
+<p>English Quiz Practice — Korean Vocabulary and Grammar</p>
+<label for="mode"><b>Choose your practice:</b></label>
+<select id="mode">
+<option value="all">Multiple Choice</option>
+<option value="particle">Korean Particles</option>
+<option value="blank">Fill in the Blank</option>
+<option value="match">Matching Practice</option>
+<option value="sentence">Sentence Practice</option>
+<option value="all">Mini Exam — Mixed Questions</option>
+</select>
+<button id="start">Start Quiz</button>
+<p class="small">Study at your own pace. Read the explanation after each answer.</p>
+</header>
+
+<section class="panel" id="quiz" hidden>
+<p id="progress"></p>
+<h2 id="question"></h2>
+<div id="choices"></div>
+<p id="feedback" aria-live="polite"></p>
+<p id="explanation"></p>
+<button id="next" hidden>Next Question →</button>
+</section>
+
+<section class="panel" id="result" hidden>
+<h2>🎉 Quiz Complete!</h2>
+<p id="score"></p>
+<p id="message"></p>
+<button id="again">Try Again</button>
+</section>
+
+<p class="small">Keep practicing every day. 화이팅! (You can do it!)</p>
+</main>
+
+<script>
+const questions = [
+{t:"all",q:"What does 학교 mean?",c:["School","Hospital","Factory","Market"],a:0,e:"학교 (hakgyo) means school."},
+{t:"all",q:"What does 물 mean?",c:["Fire","Water","Food","Air"],a:1,e:"물 (mul) means water."},
+{t:"all",q:"What does 먹다 mean?",c:["To sleep","To go","To eat","To work"],a:2,e:"먹다 (meokda) means to eat."},
+{t:"all",q:"What does 회사 mean?",c:["Company","School","Home","Station"],a:0,e:"회사 (hoesa) means company."},
+{t:"all",q:"What does 의사 mean?",c:["Teacher","Doctor","Driver","Cook"],a:1,e:"의사 (uisa) means doctor."},
+{t:"all",q:"What does 오늘 mean?",c:["Tomorrow","Yesterday","Today","Morning"],a:2,e:"오늘 (oneul) means today."},
+{t:"all",q:"What does 친구 mean?",c:["Friend","Family","Boss","Student"],a:0,e:"친구 (chingu) means friend."},
+{t:"all",q:"What does 일하다 mean?",c:["To rest","To work","To eat","To study"],a:1,e:"일하다 (ilhada) means to work."},
+{t:"all",q:"What does 병원 mean?",c:["Bank","Restaurant","Hospital","Factory"],a:2,e:"병원 (byeongwon) means hospital."},
+{t:"all",q:"What does 감사합니다 mean?",c:["Sorry","Thank you","Hello","Goodbye"],a:1,e:"감사합니다 means thank you."},
+
+{t:"particle",q:"저___ 학생입니다. (I am a student.)",c:["은","를","에","에서"],a:0,e:"은 follows a noun ending in a consonant. 저 is often followed by 는 in everyday textbook sentences; 저 + 는 is the more natural form here."},
+{t:"particle",q:"학교___ 갑니다. (I go to school.)",c:["을","에","은","와"],a:1,e:"에 marks a destination with verbs such as 가다 (to go)."},
+{t:"particle",q:"밥___ 먹습니다. (I eat a meal.)",c:["이","에","을","에서"],a:2,e:"을 marks the object of the verb when the noun ends in a consonant."},
+{t:"particle",q:"공장___ 일합니다. (I work at a factory.)",c:["에서","을","은","에게"],a:0,e:"에서 marks the place where an action happens."},
+{t:"particle",q:"친구___ 만납니다. (I meet a friend.)",c:["에","를","에서","이"],a:1,e:"를 marks the object when the noun ends in a vowel."},
+
+{t:"blank",q:"저는 물을 _____. (I drink water.)",c:["마십니다","갑니다","잡니다","옵니다"],a:0,e:"마십니다 means drink in formal polite speech."},
+{t:"blank",q:"아침에 _____ 먹습니다. (I eat breakfast.)",c:["잠을","밥을","일을","문을"],a:1,e:"밥을 먹습니다 means to eat a meal."},
+{t:"blank",q:"저는 회사에 _____. (I go to the company.)",c:["갑니다","먹습니다","마십니다","읽습니다"],a:0,e:"갑니다 means go."},
+{t:"blank",q:"날씨가 _____ . (The weather is good.)",c:["좋습니다","먹습니다","있습니다","갑니다"],a:0,e:"좋습니다 means is good."},
+{t:"blank",q:"잠을 잡니다. What does it mean?",c:["I eat.","I sleep.","I work.","I study."],a:1,e:"잠을 자다 means to sleep."},
+
+{t:"match",q:"Match the Korean word with its English meaning: 사과",c:["Apple","Water","Book","Shoes"],a:0,e:"사과 (sagwa) means apple."},
+{t:"match",q:"Match the Korean word with its English meaning: 책",c:["Door","Book","Rice","Clothes"],a:1,e:"책 (chaek) means book."},
+{t:"match",q:"Match the Korean word with its English meaning: 신발",c:["Shoes","Gloves","Hat","Bag"],a:0,e:"신발 (sinbal) means shoes."},
+{t:"match",q:"Match the Korean word with its English meaning: 문",c:["Window","Door","Chair","Table"],a:1,e:"문 (mun) means door."},
+{t:"match",q:"Match the Korean word with its English meaning: 가족",c:["Coworker","Family","Friend","Teacher"],a:1,e:"가족 (gajok) means family."},
+
+{t:"sentence",q:"Choose the correct sentence: I am a worker.",c:["저는 근로자입니다.","저는 물입니다.","저는 학교입니다.","저는 사과입니다."],a:0,e:"저는 근로자입니다 means I am a worker."},
+{t:"sentence",q:"Choose the correct sentence: I eat rice.",c:["저는 잡니다.","저는 밥을 먹습니다.","저는 회사에 갑니다.","저는 책입니다."],a:1,e:"저는 밥을 먹습니다 means I eat a meal."},
+{t:"sentence",q:"Choose the correct sentence: Where is the bathroom?",c:["화장실이 어디에 있습니까?","물이 어디에 있습니까?","밥을 먹습니까?","회사에 갑니까?"],a:0,e:"화장실이 어디에 있습니까? means Where is the bathroom?"},
+{t:"sentence",q:"Choose the correct sentence: I go to work.",c:["일합니다 먹습니다.","회사에 갑니다.","물을 잡니다.","책을 마십니다."],a:1,e:"회사에 갑니다 means I go to the company/workplace."},
+{t:"sentence",q:"Choose the correct sentence: Please give me water.",c:["물을 주세요.","물을 잡니다.","물을 갑니다.","물을 읽습니다."],a:0,e:"물을 주세요 means Please give me water."}
+];
+
+let list=[], index=0, score=0, locked=false;
+
+const $=id=>document.getElementById(id);
+
+function shuffle(arr){
+  return [...arr].sort(()=>Math.random()-0.5);
+}
+
+function startQuiz(){
+  const mode=$("mode").value;
+  list=shuffle(mode==="all"?questions:questions.filter(q=>q.t===mode));
+  if(!list.length){
+    alert("No questions found for this mode.");
+    return;
+  }
+  index=0;
+  score=0;
+  $("result").hidden=true;
+  $("quiz").hidden=false;
+  showQuestion();
+  $("quiz").scrollIntoView({behavior:"smooth"});
+}
+
+function showQuestion(){
+  locked=false;
+  const q=list[index];
+  $("progress").textContent=`Question ${index+1} of ${list.length}  |  Score: ${score}`;
+  $("question").textContent=q.q;
+  $("choices").innerHTML="";
+  $("feedback").textContent="";
+  $("explanation").textContent="";
+  $("next").hidden=true;
+
+  q.c.forEach((choice,i)=>{
+    const b=document.createElement("button");
+    b.className="choice";
+    b.textContent=String.fromCharCode(65+i)+". "+choice;
+    b.onclick=()=>answer(i,b);
+    $("choices").appendChild(b);
+  });
+}
+
+function answer(selected,button){
+  if(locked)return;
+  locked=true;
+  const q=list[index];
+  const buttons=$("choices").querySelectorAll("button");
+  buttons.forEach((b,i)=>{
+    b.disabled=true;
+    if(i===q.a)b.classList.add("correct");
+  });
+  if(selected===q.a){
+    score++;
+    $("feedback").textContent="✅ Correct!";
+  }else{
+    button.classList.add("wrong");
+    $("feedback").textContent="❌ Not quite. Try to remember the correct answer.";
+  }
+  $("explanation").textContent=q.e;
+  $("progress").textContent=`Question ${index+1} of ${list.length}  |  Score: ${score}`;
+  $("next").textContent=index===list.length-1?"See Results 🎉":"Next Question →";
+  $("next").hidden=false;
+}
+
+function nextQuestion(){
+  index++;
+  if(index<list.length){
+    showQuestion();
+  }else{
+    $("quiz").hidden=true;
+    $("result").hidden=false;
+    $("score").textContent=`Your score: ${score} / ${list.length} (${Math.round(score/list.length*100)}%)`;
+    $("message").textContent=score/list.length>=0.8
+      ?"Excellent work! Keep studying to prepare for EPS-TOPIK."
+      :"Good effort! Review the explanations and try again.";
+    $("result").scrollIntoView({behavior:"smooth"});
+  }
+}
+
+$("start").addEventListener("click",startQuiz);
+$("next").addEventListener("click",nextQuestion);
+$("again").addEventListener("click",startQuiz);
+</script>
+</body>
+</html>
