@@ -31,7 +31,9 @@ button:disabled{opacity:.5}
 <h1>🌸 EPS-TOPIK Study Hub</h1>
 <p>English Quiz Practice — Korean Vocabulary and Grammar</p>
 <label for="mode"><b>Choose your practice:</b></label>
-<select id="mode">
+<option value="all">Mini Exam — Mixed Questions</option>
+<option value="ubt">UBT Exam — 40 Questions</option>
+</select><sel<option value="ubt">UBT Exam — 40 Questions</option>ect<option value="all">Mini Exam — Mixed Questions</option> id="mode">
 <option value="all">Multiple Choice</option>
 <option value="particle">Korean Particles</option>
 <option value="blank">Fill in the Blank</option>
@@ -44,7 +46,7 @@ button:disabled{opacity:.5}
 </header>
 
 <section class="panel" id="quiz" hidden>
-<p id="progress"></p>
+<p id="progress"></p<p id="timer">Time left: 50:00</p>
 <h2 id="question"></h2>
 <div id="choices"></div>
 <p id="feedback" aria-live="polite"></p>
@@ -110,16 +112,39 @@ function shuffle(arr){
 
 function startQuiz(){
   const mode=$("mode").value;
-  list=shuffle(mode==="all"?questions:questions.filter(q=>q.t===mode));
+  list=shuffle(mode==="all"||mode==="ubt"?questions:questions.filter(q=>q.t===mode))
   if(!list.length){
     alert("No questions found for this mode.");
     return;
   }
   index=0;
-  score=0;
-  $("result").hidden=true;
-  $("quiz").hidden=false;
-  showQuestion();
+score=0;
+locked=false;
+$("result").hidden=true;
+$("quiz").hidden=false;
+
+if(window.examTimer) clearInterval(window.examTimer);
+
+if($("mode").value==="ubt"){
+  window.examSeconds=50*60;
+  window.examTimer=setInterval(()=>{
+    window.examSeconds--;
+    let m=Math.floor(window.examSeconds/60);
+    let s=window.examSeconds%60;
+    $("timer").textContent=
+      "Time left: "+m+":"+String(s).padStart(2,"0");
+    if(window.examSeconds<=0){
+      clearInterval(window.examTimer);
+      alert("Time is up!");
+      $("result").hidden=false;
+      $("quiz").hidden=true;
+    }
+  },1000);
+}else{
+  $("timer").textContent="";
+}
+
+showQuestion();
   $("quiz").scrollIntoView({behavior:"smooth"});
 }
 
