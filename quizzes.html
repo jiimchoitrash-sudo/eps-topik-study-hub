@@ -33,6 +33,7 @@ button:disabled{opacity:.5}
 
 
 
+
 <label for="mode"><b>Choose your practice:</b></label>
 <select id="mode">
   <option value="all">Mini Exam — Mixed Questions</option>
@@ -42,15 +43,13 @@ button:disabled{opacity:.5}
   <option value="match">Matching Practice</option>
   <option value="sentence">Sentence Practice</option>
 </select>
-<button id="start" type="button" onclick="startQuiz()">Start Quiz</button>
-<p class="small">Study at your own pace. Read the explanation after each answer.</p>
-
+<button id="start">Start Quiz</button>
 <p class="small">Study at your own pace. Read the explanation after each answer.</p>
 </header>
-
 <section class="panel" id="quiz" hidden>
 <p id="progress"></p>
-<p id="timer"></p></p<p id="timer">Time left: 50:00</p>
+<p id="timer"></p>
+></p<p id="timer">Time left: 50:00</p>
 <h2 id="question"></h2>
 <div id="choices"></div>
 <p id="feedback" aria-live="polite"></p>
